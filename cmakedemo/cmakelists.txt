@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.13)
+project(sort)
+
+if(MSVC)
+	set(ALL_CXX_FLAGS CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
+	foreach(flag ${ALL_CXX_FLAGS})
+		string(REPLACE "/MD" "/MT" ${flag} "${${flag}}")
+	endforeach()
+endif()
+
+include(FetchContent)
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://gitee.com/mirrors/googletest
+    GIT_TAG release-1.12.1)
+FetchContent_MakeAvailable(googletest)
+
+add_subdirectory(src)
+
+add_executable(${PROJECT_NAME} main.cpp)
+add_executable(mytest test/gtest.cpp)
+add_executable(banktest test/banktest.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE myprint mysort)
+target_link_libraries(mytest PRIVATE mysort gtest_main gmock_main)
+target_link_libraries(banktest PRIVATE gtest_main)
+
+enable_testing()
+add_test(NAME unitTest COMMAND mytest)
+add_test(NAME integrationTest COMMAND ${PROJECT_NAME} 2 4 3 1 6)
+add_test(NAME integrationTestEmpty COMMAND ${PROJECT_NAME})
+set_tests_properties(integrationTest 
+	PROPERTIES PASS_REGULAR_EXPRESSION "1 2 3 4 6")
+set_tests_properties(integrationTestEmpty
+	PROPERTIES WILL_FAIL TRUE)

@@ -1,0 +1,9 @@
+function(set_library lib)
+    message(STATUS "${CMAKE_CURRENT_FUNCTION} function called for lib my${lib}")
+    project(${lib})
+    add_library(my${lib} ${lib}.cpp)
+    target_include_directories(my${lib} PUBLIC ${CMAKE_SOURCE_DIR}/include/${lib})
+endfunction()
+
+add_subdirectory(print)
+add_subdirectory(sort)
